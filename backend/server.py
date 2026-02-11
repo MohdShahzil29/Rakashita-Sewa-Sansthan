@@ -1420,7 +1420,7 @@ async def root():
 
 
 origins_env = os.environ.get('CORS_ORIGINS',
-    'https://ngo-3-freelancing-project-ye1a.vercel.app,https://rakashita-sewa-sansthan.onrender.com'
+    'https://rakashita-sewa-sansthan.vercel.app,https://rakashita-sewa-sansthan.onrender.com'
 )
 origins = [o.strip() for o in origins_env.split(',') if o.strip()]
 
@@ -1436,7 +1436,7 @@ app.add_middleware(
        allow_origins=[
         "http://localhost:3000",
         # "http://0.0.0.0:8000",
-        "https://ngo-3-freelancing-project-ye1a.vercel.app"
+        "https://rakashita-sewa-sansthan.vercel.app"
     ],
     allow_credentials=False,     # only if you need cookies/auth
     allow_methods=["*"],        # allow OPTIONS, POST, GET, etc.
