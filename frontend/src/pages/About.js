@@ -10,10 +10,11 @@ import {
   Stethoscope,
   Scale,
 } from "lucide-react";
-import NarenderImage from "@/assets/Narender.jpeg";
-import कृष्ण from "@/assets/कृष्ण.jpeg";
-import जीतेशकुमारगुप्ता from "@/assets/जीतेश कुमार गुप्ता.jpeg";
+
 import { Link } from "react-router-dom";
+import FounderImage from "@/assets/Founder.jpeg";
+import betiImage from "@/assets/beti.jpeg";
+import goverment from "@/assets/goverment.jpeg";
 
 /**
  * About.jsx
@@ -66,11 +67,11 @@ const areasOfWork = [
   },
 ];
 
-const teamMembers = [
-  { name: "जीतेश कुमार गुप्ता", role: "Co-Founder", img: जीतेशकुमारगुप्ता },
-  { name: "नरेंद्र कुमार महावर", role: "चेयरमैन", img: NarenderImage },
-  { name: "कृष्ण कुमार", role: "ट्रेजर (कोषाध्यक्ष)", img: कृष्ण },
-];
+// const teamMembers = [
+//   { name: "जीतेश कुमार गुप्ता", role: "Co-Founder", img: जीतेशकुमारगुप्ता },
+//   { name: "नरेंद्र कुमार महावर", role: "चेयरमैन", img: NarenderImage },
+//   { name: "कृष्ण कुमार", role: "ट्रेजर (कोषाध्यक्ष)", img: कृष्ण },
+// ];
 
 const counterTargets = [
   { id: "families", label: "परिवारों की मदद", value: 5000, suffix: "+" },
@@ -293,7 +294,7 @@ const About = () => {
               <div className="md:col-span-1 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center p-8">
                 <div className="text-center">
                   <img
-                    src="https://customer-assets.emergentagent.com/job_ngoboost/artifacts/sko38kqw_IMG-20260113-WA0005.jpg"
+                    src={FounderImage}
                     alt="Mukesh Kumar Mahawar"
                     className="w-44 h-44 object-cover rounded-full border-4 border-white shadow-lg mx-auto"
                   />
@@ -327,35 +328,6 @@ const About = () => {
               </div>
             </div>
           </motion.div>
-        </div>
-      </section>
-
-      {/* Team */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">Team Members</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {teamMembers.map((m, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.06 }}
-                className="bg-white rounded-xl border border-stone-200 p-6 flex items-center gap-4 hover:shadow-lg transition-transform transform hover:-translate-y-2"
-              >
-                <img
-                  src={m.img}
-                  alt={m.name}
-                  className="w-20 h-20 rounded-full object-cover border-2 border-primary"
-                />
-                <div>
-                  <h4 className="font-semibold">{m.name}</h4>
-                  <p className="text-primary font-medium mt-1">{m.role}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -432,6 +404,65 @@ const About = () => {
         </div>
       </section>
 
+      {/* Beti Bachao + Government Approval Section */}
+      <section className="py-16 bg-gradient-to-br from-pink-50 via-white to-blue-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="bg-white rounded-2xl shadow-xl border border-stone-200 overflow-hidden"
+          >
+            <div className="grid md:grid-cols-2 gap-0">
+              {/* Beti Bachao Section */}
+              <div className="p-8 flex flex-col justify-center bg-pink-50">
+                <div className="flex justify-center md:justify-start mb-4">
+                  <img
+                    src={betiImage}
+                    alt="Beti Bachao Beti Padhao"
+                    className="w-40 md:w-52 object-contain drop-shadow-md"
+                  />
+                </div>
+
+                <h3 className="text-2xl md:text-3xl font-bold text-pink-700 mb-4 text-center md:text-left">
+                  बेटी बचाओ – बेटी पढ़ाओ
+                </h3>
+
+                <p className="text-stone-700 leading-relaxed text-center md:text-left">
+                  हमारी संस्था "बेटी बचाओ – बेटी पढ़ाओ" अभियान का पूर्ण समर्थन
+                  करती है। हम बालिकाओं की शिक्षा, सुरक्षा और सशक्तिकरण के लिए
+                  निरंतर कार्यरत हैं। हमारा लक्ष्य है कि हर बेटी को समान अवसर,
+                  सम्मान और उज्ज्वल भविष्य मिले।
+                </p>
+              </div>
+
+              {/* Government Approved Section */}
+              <div className="p-8 flex flex-col justify-center bg-blue-50 border-t md:border-t-0 md:border-l border-stone-200">
+                <div className="flex justify-center md:justify-start mb-4">
+                  <img
+                    src={goverment}
+                    alt="Approved by Government"
+                    className="w-36 md:w-48 object-contain drop-shadow-md"
+                  />
+                </div>
+
+                <h3 className="text-2xl md:text-3xl font-bold text-blue-700 mb-4 text-center md:text-left">
+                  भारत सरकार द्वारा अनुमोदित
+                </h3>
+
+                <p className="text-stone-700 leading-relaxed text-center md:text-left">
+                  Rakshita Sewa Sansthan एक पंजीकृत एवं सरकारी मान्यता प्राप्त
+                  संस्था है। हमारी सभी गतिविधियाँ पारदर्शिता, जवाबदेही और कानूनी
+                  नियमों के अंतर्गत संचालित होती हैं। हम समाज सेवा के कार्यों
+                  में पूर्ण ईमानदारी और विश्वसनीयता बनाए रखते हैं।
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Contact */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
@@ -442,10 +473,7 @@ const About = () => {
             <div className="grid md:grid-cols-3 gap-6 text-center">
               <div>
                 <h4 className="font-semibold mb-2">पता</h4>
-                <p className="text-stone-600">
-                  नारायण निवास, बजरंग नगर, मोड़ा बालाजी रोड, दौसा, राजस्थान –
-                  303303
-                </p>
+                <p className="text-stone-600">रक्षिता सेवा संस्थान, बलौदा</p>
               </div>
               <div>
                 <h4 className="font-semibold mb-2">फोन</h4>

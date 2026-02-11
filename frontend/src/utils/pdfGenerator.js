@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import logo from "@/assets/logo.jpeg";
 
 export const generateCertificatePDF = (certificate) => {
   const doc = new jsPDF({
@@ -8,89 +9,185 @@ export const generateCertificatePDF = (certificate) => {
     format: "a4",
   });
 
-  // Add border
+  const W = 297;
+  const H = 210;
+  const CX = W / 2;
+
+  // Outer border
   doc.setLineWidth(2);
-  doc.rect(10, 10, 277, 190);
+  doc.setDrawColor(40, 45, 52);
+  doc.rect(8, 8, W - 16, H - 16);
 
-  // Add decorative inner border
-  doc.setLineWidth(0.5);
-  doc.rect(15, 15, 267, 180);
+  // Inner thin border (dashed effect)
+  doc.setLineWidth(0.6);
+  doc.setDrawColor(120);
+  // dashed: draw short segments manually
+  const dash = (x1, y1, x2, y2, seg = 3, gap = 2) => {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const segments = Math.floor(dist / (seg + gap));
+    for (let i = 0; i < segments; i++) {
+      const t1 = (i * (seg + gap)) / dist;
+      const t2 = (i * (seg + gap) + seg) / dist;
+      const sx = x1 + dx * t1;
+      const sy = y1 + dy * t1;
+      const ex = x1 + dx * t2;
+      const ey = y1 + dy * t2;
+      doc.line(sx, sy, ex, ey);
+    }
+  };
+  // top
+  dash(15, 15, W - 15, 15);
+  // right
+  dash(W - 15, 15, W - 15, H - 15);
+  // bottom
+  dash(W - 15, H - 15, 15, H - 15);
+  // left
+  dash(15, H - 15, 15, 15);
 
-  // Title
-  doc.setFontSize(32);
+  // Light watermark diagonal (organization name)
   doc.setFont("helvetica", "bold");
-  doc.text("CERTIFICATE", 148.5, 40, { align: "center" });
+  doc.setFontSize(42);
+  doc.setTextColor(220); // light gray
+  // rotate text by -35 degrees around center-ish
+  doc.text("Rakashita Sewa Sansthan", CX, H / 2 + 10, {
+    align: "center",
+    angle: -35,
+  });
 
-  // Certificate type
-  doc.setFontSize(16);
+  // doc.setDrawColor(80);
+  // doc.setLineWidth(0.8);
+  // doc.roundedRect(18, 18, 30, 30, 3, 3); // logo box
+  // doc.setFontSize(7);
+  // doc.setTextColor(80);
+  // doc.text("Logo", 18 + 15, 18 + 17, { align: "center" });
+
+  // Add Logo Image
+  doc.addImage(logo, "JPEG", 18, 18, 30, 30);
+
+  // Header: company name + ribbon
+  // gold ribbon background
+  doc.setFillColor(245, 221, 160);
+  doc.setDrawColor(200);
+  doc.rect(CX - 110, 22, 220, 18, "F");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.setTextColor(30);
+  doc.text("CERTIFICATE OF ACHIEVEMENT", CX, 36, { align: "center" });
+
+  // small subtitle / certificate type
   doc.setFont("helvetica", "normal");
-  doc.text(`of ${certificate.certificate_type}`, 148.5, 55, {
+  doc.setFontSize(12);
+  doc.text(`${certificate.certificate_type || "Participation"}`, CX, 44, {
     align: "center",
   });
 
-  // Divider line
-  doc.setLineWidth(0.5);
-  doc.line(80, 60, 217, 60);
+  // Divider decorative
+  doc.setLineWidth(0.6);
+  doc.setDrawColor(180);
+  doc.line(60, 52, W - 60, 52);
 
-  // This is to certify that
-  doc.setFontSize(14);
-  doc.text("This is to certify that", 148.5, 75, { align: "center" });
-
-  // Recipient name
-  doc.setFontSize(24);
-  doc.setFont("helvetica", "bold");
-  doc.text(certificate.recipient_name, 148.5, 90, { align: "center" });
-
-  // Certificate content/description
-  doc.setFontSize(12);
+  // "This is to certify that"
+  doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
-  const description = `has been awarded this certificate by NVP Welfare Foundation India`;
-  doc.text(description, 148.5, 105, { align: "center", maxWidth: 200 });
+  doc.setTextColor(60);
+  doc.text("This is to certify that", CX, 70, { align: "center" });
 
-  // Certificate details
-  doc.setFontSize(10);
-  doc.text(
-    `Certificate Number: ${certificate.certificate_number}`,
-    148.5,
-    125,
-    { align: "center" },
-  );
-  doc.text(
-    `Issue Date: ${new Date(certificate.issue_date).toLocaleDateString()}`,
-    148.5,
-    135,
-    { align: "center" },
-  );
+  // Recipient name - prominent
+  doc.setFont("times", "italic"); // slightly formal script-ish
+  doc.setFontSize(30);
+  doc.setTextColor(10);
+  doc.text(certificate.recipient_name || "Recipient Name", CX, 88, {
+    align: "center",
+    maxWidth: 220,
+  });
 
-  // Organization details
+  // Description line
+  doc.setFont("helvetica", "normal");
   doc.setFontSize(12);
+  const desc =
+    certificate.description ||
+    "has successfully completed the program and is hereby recognized for outstanding performance.";
+  doc.text(desc, CX, 102, { align: "center", maxWidth: 230 });
+
+  // Details (number + date) - centered, small
+  doc.setFontSize(10);
+  doc.setTextColor(80);
+  doc.text(
+    `Certificate No: ${certificate.certificate_number || "----"}`,
+    CX,
+    118,
+    { align: "center" },
+  );
+  const issueDateText = certificate.issue_date
+    ? new Date(certificate.issue_date).toLocaleDateString()
+    : "-";
+  doc.text(`Issue Date: ${issueDateText}`, CX, 124, { align: "center" });
+
+  // Left block: Organization details
   doc.setFont("helvetica", "bold");
-  doc.text("NVP Welfare Foundation India", 148.5, 160, { align: "center" });
+  doc.setFontSize(12);
+  doc.setTextColor(30);
+  doc.text("Rakashita Sewa Sansthan", 40, 150);
+
+  doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  doc.setFont("helvetica", "normal");
   doc.text(
-    "नारायण निवास, बजरंग नगर, मोड़ा बालाजी रोड, दौसा, राजस्थान – 303303",
-    148.5,
-    167,
-    { align: "center" },
+    certificate.organization_address || "Rakashita Sewa Sansthan, Baloda",
+    40,
+    156,
+    { maxWidth: 120 },
   );
-  doc.text("Phone: 99828 15922 | Email: Darasingh51896@gamil.com", 148.5, 173, {
-    align: "center",
-  });
+  if (certificate.organization_contact) {
+    doc.text(`Phone: ${certificate.organization_contact}`, 40, 162);
+  }
 
-  // Signature line
-  doc.line(180, 150, 240, 150);
-  doc.setFontSize(10);
-  doc.text("Authorized Signature", 210, 155, { align: "center" });
-
-  // Footer note
+  // Right block: Seal and signature
+  // Seal circle
+  const sealX = W - 60;
+  const sealY = 150;
+  doc.setFillColor(240, 210, 100);
+  doc.circle(sealX, sealY, 22, "F");
+  doc.setDrawColor(120);
+  doc.circle(sealX, sealY, 22);
   doc.setFontSize(8);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(30);
+  doc.text("R.S.S", sealX, sealY - 1, { align: "center" });
+  doc.setFontSize(6);
+  doc.setFont("helvetica", "normal");
+  doc.text("Rakashita Sewa Sansthan", sealX, sealY + 6, { align: "center" });
+
+  // Signature line below seal
+  doc.setLineWidth(0.6);
+  doc.line(sealX - 32, sealY + 30, sealX + 32, sealY + 30);
+  doc.setFontSize(10);
+  doc.text("Authorized Signatory", sealX, sealY + 38, { align: "center" });
+
+  // Small footer note centered
+  doc.setFontSize(8);
+  doc.setTextColor(120);
   doc.text(
-    "This is a computer-generated certificate and does not require a signature.",
-    148.5,
-    185,
+    "This is a computer-generated certificate and does not require a physical signature.",
+    CX,
+    H - 16,
     { align: "center" },
   );
+
+  // Optional: add small QR code or validation link placeholder bottom-left
+  doc.setFontSize(7);
+  doc.setTextColor(100);
+  doc.text(
+    "Validate: https://wingstarnarketing.com/verify/" +
+      (certificate.certificate_number || ""),
+    40,
+    H - 16,
+  );
+
+  // Reset font color (good practice)
+  doc.setTextColor(0);
 
   return doc;
 };

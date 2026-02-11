@@ -71,6 +71,8 @@ const AdminDashboard = () => {
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [memberUsers, setMemberUsers] = useState([]); // users with role=member
+  const [galleryImages, setGalleryImages] = useState([]);
+  const [galleryUploading, setGalleryUploading] = useState(false);
 
   // Forms state
   const [beneficiaryForm, setBeneficiaryForm] = useState({
@@ -774,6 +776,7 @@ const AdminDashboard = () => {
     { id: "certificates", label: "Certificates", icon: Award },
     { id: "news", label: "News", icon: Newspaper },
     { id: "activities", label: "Activities", icon: Image },
+    { id: "gallery", label: "Gallery", icon: Image },
     { id: "campaigns", label: "Campaigns", icon: TrendingUp },
     { id: "events", label: "Events", icon: Calendar },
     { id: "enquiries", label: "Enquiries", icon: MessageSquare },
@@ -791,6 +794,37 @@ const AdminDashboard = () => {
       </div>
     );
   }
+
+  const handleGalleryUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload only image files");
+      return;
+    }
+
+    setGalleryUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await axios.post(`${API}/upload-image`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      const imageUrl = res.data.url;
+
+      setGalleryImages((prev) => [...prev, imageUrl]);
+
+      toast.success("Image added to gallery!");
+    } catch (err) {
+      toast.error("Failed to upload image");
+    } finally {
+      setGalleryUploading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-stone-50" data-testid="admin-dashboard">
@@ -1102,6 +1136,65 @@ const AdminDashboard = () => {
                                 <Trash2 size={16} />
                               </Button>
                             </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {activeTab === "gallery" && (
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Add Gallery Image</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleGalleryUpload}
+                      disabled={galleryUploading}
+                    />
+                    {galleryUploading && (
+                      <p className="text-sm text-stone-500 mt-2">
+                        Uploading...
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Gallery Images</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {galleryImages.length === 0 ? (
+                      <p className="text-stone-500 text-center py-6">
+                        No gallery images yet
+                      </p>
+                    ) : (
+                      <div className="grid md:grid-cols-4 gap-4">
+                        {galleryImages.map((img, index) => (
+                          <div key={index} className="relative">
+                            <img
+                              src={getImageUrl(img)}
+                              className="w-full h-40 object-cover rounded-lg"
+                            />
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="absolute top-2 right-2"
+                              onClick={() =>
+                                setGalleryImages((prev) =>
+                                  prev.filter((_, i) => i !== index),
+                                )
+                              }
+                            >
+                              <Trash2 size={14} />
+                            </Button>
                           </div>
                         ))}
                       </div>
@@ -1728,9 +1821,6 @@ const AdminDashboard = () => {
                 </Card>
               </div>
             )}
-
-            {/* Other existing tabs (News, Activities, Campaigns, Events, Certificates, Donations, Enquiries, Beneficiaries) */}
-            {/* ... keeping existing implementations ... */}
 
             {activeTab === "news" && (
               <div className="space-y-6">
@@ -2382,7 +2472,10 @@ const AdminDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <form
-                      onSubmit={handleGenerateCertificate}
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        downloadCertificatePDF(certificateForm);
+                      }}
                       className="space-y-4"
                     >
                       <div>
@@ -2500,12 +2593,7 @@ const AdminDashboard = () => {
                               <Button
                                 size="sm"
                                 className="flex-1"
-                                onClick={() =>
-                                  window.open(
-                                    `${BACKEND_URL}/api/certificates/${cert.certificate_number}/download`,
-                                    "_blank",
-                                  )
-                                }
+                                onClick={() => downloadCertificatePDF(cert)}
                               >
                                 <Download size={16} className="mr-2" />
                                 Download

@@ -174,10 +174,7 @@ const Contact = () => {
                   <h3 className="font-heading font-semibold text-xl text-stone-900 mb-2">
                     पता
                   </h3>
-                  <p className="text-stone-600">
-                    नारायण निवास, बजरंग नगर, मोड़ा बालाजी रोड, दौसा, राजस्थान –
-                    303303
-                  </p>
+                  <p className="text-stone-600">रक्षिता सेवा संस्थान, बलौदा</p>
                 </div>
               </div>
             </div>

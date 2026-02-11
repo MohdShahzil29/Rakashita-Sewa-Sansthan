@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import VisitGallery from "@/components/VisitGallery";
 
 const BACKEND_URL = "https://rakashita-sewa-sansthan.onrender.com";
 const API = `${BACKEND_URL}/api`;
@@ -574,6 +575,8 @@ const Home = () => {
           </div>
         </section>
       )}
+
+      <VisitGallery />
 
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

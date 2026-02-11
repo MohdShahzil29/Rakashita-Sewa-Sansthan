@@ -1102,6 +1102,19 @@ async def delete_event(event_id: str, user_data: dict = Depends(verify_token)):
 
 # ==================== PROJECT ROUTES ====================
 
+@api_router.get("/gallery")
+async def get_gallery_images():
+    """Return all uploaded images"""
+    files = []
+    for file in UPLOAD_DIR.iterdir():
+        if file.is_file():
+            files.append({
+                "id": file.name,
+                "image_url": f"/api/uploads/{file.name}"
+            })
+    return files
+
+
 @api_router.post("/projects")
 async def create_project(project_data: dict, user_data: dict = Depends(verify_token)):
     if user_data['role'] != 'admin':
@@ -1407,16 +1420,7 @@ async def delete_certificate(certificate_id: str, user_data: dict = Depends(veri
 async def root():
     return {"message": "NVP Welfare Foundation India API", "status": "running"}
 
-# Include router
-# app.include_router(api_router)
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_credentials=True,
-#     allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
 
 
 origins_env = os.environ.get('CORS_ORIGINS',
@@ -1435,7 +1439,8 @@ app.add_middleware(
     CORSMiddleware,
        allow_origins=[
         "http://localhost:3000",
-        # "http://0.0.0.0:8000",
+        "http://0.0.0.0:8000",
+        "https://rakashita-sewa-sansthan.vercel.app"
         "https://rakashita-sewa-sansthan.vercel.app"
     ],
     allow_credentials=False,     # only if you need cookies/auth
