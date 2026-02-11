@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const BACKEND_URL = "https://ngo-3-freelancing-project.onrender.com";
+const BACKEND_URL = "https://rakashita-sewa-sansthan.onrender.com";
 const API = `${BACKEND_URL}/api`;
 const RAZORPAY_KEY_ID = "rzp_live_SAlQyx5sRXqQwH";
 

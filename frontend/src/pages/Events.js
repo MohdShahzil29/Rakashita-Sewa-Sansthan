@@ -4,7 +4,7 @@ import { Calendar, MapPin, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 
-const BACKEND_URL = "https://ngo-3-freelancing-project.onrender.com";
+const BACKEND_URL = "https://rakashita-sewa-sansthan.onrender.com";
 const API = `${BACKEND_URL}/api`;
 
 const Events = () => {

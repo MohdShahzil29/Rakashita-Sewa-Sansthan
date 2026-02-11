@@ -3,7 +3,7 @@ import axios from "axios";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 
-const BACKEND_URL = "https://ngo-3-freelancing-project.onrender.com";
+const BACKEND_URL = "https://rakashita-sewa-sansthan.onrender.com";
 const API = `${BACKEND_URL}/api`;
 
 const Campaigns = () => {

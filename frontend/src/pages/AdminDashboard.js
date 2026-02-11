@@ -40,7 +40,7 @@ import {
   downloadReceiptPDF,
 } from "../utils/pdfGenerator";
 
-const BACKEND_URL = "http://0.0.0.0:8000";
+const BACKEND_URL = "https://rakashita-sewa-sansthan.onrender.com";
 const API = `${BACKEND_URL}/api`;
 
 const token = localStorage.getItem("token");

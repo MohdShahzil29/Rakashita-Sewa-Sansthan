@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart, FileText, Award, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const BACKEND_URL = " https://ngo-3-freelancing-project.onrender.com";
+const BACKEND_URL = " https://rakashita-sewa-sansthan.onrender.com";
 const API = `${BACKEND_URL}/api`;
 
 const MemberDashboard = () => {
@@ -20,7 +20,7 @@ const MemberDashboard = () => {
     if (user?.role !== "member") {
       navigate("/pending-approval");
     }
-  }, [user]);
+  }, [user, navigate]);
 
   useEffect(() => {
     fetchData();

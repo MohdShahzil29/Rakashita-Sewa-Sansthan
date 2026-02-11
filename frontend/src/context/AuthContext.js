@@ -9,14 +9,14 @@ import axios from "axios";
 
 const AuthContext = createContext();
 
-const BACKEND_URL = "https://ngo-3-freelancing-project.onrender.com";
+const BACKEND_URL = "https://rakashita-sewa-sansthan.onrender.com";
 const API = `${BACKEND_URL}/api`;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  console.log("BACKEND_URL:", "https://ngo-3-freelancing-project.onrender.com");
+  console.log("BACKEND_URL:", "https://rakashita-sewa-sansthan.onrender.com");
 
   // ✅ FIX 1: useCallback
   const fetchCurrentUser = useCallback(async () => {

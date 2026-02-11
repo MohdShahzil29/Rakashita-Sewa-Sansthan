@@ -14,8 +14,15 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const BACKEND_URL = "https://ngo-3-freelancing-project.onrender.com";
+const BACKEND_URL = "https://rakashita-sewa-sansthan.onrender.com";
 const API = `${BACKEND_URL}/api`;
+
+const heroImages = [
+  "https://images.unsplash.com/photo-1509099836639-18ba1795216d?q=85&auto=format&fit=crop&w=1600",
+  "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=85&auto=format&fit=crop&w=1600",
+  "https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?q=85&auto=format&fit=crop&w=1600",
+  "https://images.unsplash.com/photo-1593113598332-cd288d649433?q=85&auto=format&fit=crop&w=1600",
+];
 
 const Home = () => {
   const [stats, setStats] = useState({
@@ -75,21 +82,21 @@ const Home = () => {
     }
   };
 
-  const heroImages = [
-    "https://images.unsplash.com/photo-1509099836639-18ba1795216d?q=85&auto=format&fit=crop&w=1600",
-    "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=85&auto=format&fit=crop&w=1600",
-    "https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?q=85&auto=format&fit=crop&w=1600",
-    "https://images.unsplash.com/photo-1593113598332-cd288d649433?q=85&auto=format&fit=crop&w=1600",
-  ];
-
   const [index, setIndex] = useState(0);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setIndex((prev) => (prev + 1) % heroImages.length);
+  //   }, 5000); // image change every 5 sec
+
+  //   return () => clearInterval(interval);
+  // }, []);
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % heroImages.length);
-    }, 5000); // image change every 5 sec
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [heroImages.length]);
 
   return (
     <div className="min-h-screen" data-testid="home-page">

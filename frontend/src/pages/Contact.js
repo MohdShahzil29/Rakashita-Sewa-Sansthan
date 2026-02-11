@@ -7,7 +7,7 @@ import { Phone, Mail, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 
-const BACKEND_URL = "https://ngo-3-freelancing-project.onrender.com";
+const BACKEND_URL = "https://rakashita-sewa-sansthan.onrender.com";
 const API = `${BACKEND_URL}/api`;
 
 const Contact = () => {
