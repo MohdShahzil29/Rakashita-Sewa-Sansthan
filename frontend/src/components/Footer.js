@@ -8,7 +8,7 @@ import {
   Mail,
   MapPin,
 } from "lucide-react";
-
+import logoImage from "@/assets/logo.jpeg";
 const Footer = () => {
   return (
     <footer className="bg-stone-900 text-stone-300">
@@ -18,12 +18,12 @@ const Footer = () => {
           <div>
             <div className="flex items-center space-x-3 mb-4">
               <img
-                src="https://customer-assets.emergentagent.com/job_ngoboost/artifacts/oauqu6j1_IMG-20260110-WA0009.jpg"
+                src={logoImage}
                 alt="NVP Welfare Foundation India"
                 className="h-10 w-10 object-contain bg-white rounded-full p-1"
               />
               <span className="font-heading font-bold text-lg text-white">
-                NVP Welfare Foundation
+                Rakashita Sewa Sansthan
               </span>
             </div>
             <p className="text-stone-400 text-sm">
@@ -128,18 +128,15 @@ const Footer = () => {
             <div className="flex flex-col space-y-3 text-sm">
               <div className="flex items-start space-x-2">
                 <MapPin size={18} className="mt-1 flex-shrink-0" />
-                <span>
-                  नारायण निवास, बजरंग नगर, मोड़ा बालाजी रोड, दौसा, राजस्थान –
-                  303303
-                </span>
+                <span>रक्षिता सेवा संस्थान, बलौदा</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone size={18} className="flex-shrink-0" />
-                <span>78776 43155</span>
+                <span>9982815922 , 8619362838</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail size={18} className="flex-shrink-0" />
-                <span>nvpwfoundationindia@gmail.com</span>
+                <span>Darasingh51896@gamil.com</span>
               </div>
             </div>
           </div>
@@ -148,7 +145,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-stone-800 mt-8 pt-6 text-center text-sm text-stone-400 space-y-2">
           <p>
-            &copy; {new Date().getFullYear()} NVP Welfare Foundation India. All
+            &copy; {new Date().getFullYear()} Rakashita Sewa Sansthan. All
             rights reserved.
           </p>
           <p className="text-stone-500">

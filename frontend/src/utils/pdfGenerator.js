@@ -74,12 +74,9 @@ export const generateCertificatePDF = (certificate) => {
     167,
     { align: "center" },
   );
-  doc.text(
-    "Phone: 78776 43155 | Email: nvpwfoundationindia@gmail.com",
-    148.5,
-    173,
-    { align: "center" },
-  );
+  doc.text("Phone: 99828 15922 | Email: Darasingh51896@gamil.com", 148.5, 173, {
+    align: "center",
+  });
 
   // Signature line
   doc.line(180, 150, 240, 150);
@@ -101,135 +98,130 @@ export const generateCertificatePDF = (certificate) => {
 export const generateReceiptPDF = (receipt) => {
   const doc = new jsPDF();
 
-  // Header background
-  doc.setFillColor(15, 118, 110); // Primary color
-  doc.rect(0, 0, 210, 40, "F");
+  const pageWidth = doc.internal.pageSize.getWidth();
 
-  // Logo/Title
+  // ===== HEADER =====
+  doc.setFillColor(13, 148, 136); // Teal Premium
+  doc.rect(0, 0, pageWidth, 45, "F");
+
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(24);
   doc.setFont("helvetica", "bold");
-  doc.text("NVP Welfare Foundation India", 105, 20, { align: "center" });
+  doc.setFontSize(22);
+  doc.text("Rakashita Sewa Sansthan", pageWidth / 2, 20, {
+    align: "center",
+  });
 
-  doc.setFontSize(12);
+  doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
   doc.text(
-    "नारायण निवास, बजरंग नगर, मोड़ा बालाजी रोड, दौसा, राजस्थान – 303303",
-    105,
+    "Narayan Niwas, Bajrang Nagar, Dausa, Rajasthan - 303303",
+    pageWidth / 2,
     30,
-    {
-      align: "center",
-    },
+    { align: "center" },
   );
 
-  // Reset text color
+  doc.text(
+    "Contact: 9982815922 | Email: Darasingh51896@gmail.com",
+    pageWidth / 2,
+    37,
+    { align: "center" },
+  );
+
   doc.setTextColor(0, 0, 0);
 
-  // Receipt title
-  doc.setFontSize(20);
+  // ===== RECEIPT TITLE =====
   doc.setFont("helvetica", "bold");
-  doc.text("RECEIPT", 105, 55, { align: "center" });
+  doc.setFontSize(18);
+  doc.text("OFFICIAL RECEIPT", pageWidth / 2, 60, { align: "center" });
 
-  // Receipt details box
+  doc.setLineWidth(0.8);
+  doc.line(20, 65, pageWidth - 20, 65);
+
+  // ===== MAIN BOX =====
+  doc.setDrawColor(200);
   doc.setLineWidth(0.5);
-  doc.rect(15, 65, 180, 80);
+  doc.roundedRect(15, 75, pageWidth - 30, 95, 3, 3);
 
-  // Receipt number (highlighted)
-  doc.setFillColor(250, 250, 249);
-  doc.rect(15, 65, 180, 15, "F");
+  // ===== Receipt Number Badge =====
+  doc.setFillColor(240, 240, 240);
+  doc.rect(15, 75, pageWidth - 30, 15, "F");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text(`Receipt No: ${receipt.receipt_number}`, 20, 85);
+
+  // ===== DETAILS =====
+  doc.setFont("helvetica", "normal");
   doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text(`Receipt No: ${receipt.receipt_number}`, 20, 75);
 
-  // Receipt details
-  doc.setFontSize(11);
+  let y = 105;
+  const gap = 10;
+
+  const addRow = (label, value, bold = false) => {
+    doc.setFont("helvetica", "normal");
+    doc.text(label, 25, y);
+
+    doc.setFont("helvetica", bold ? "bold" : "normal");
+    doc.text(value || "-", 80, y);
+
+    y += gap;
+  };
+
+  addRow("Receipt Type:", receipt.receipt_type || "General");
+  addRow("Recipient Name:", receipt.recipient_name);
+
+  // ===== Amount Highlight =====
+  doc.setFillColor(220, 252, 231);
+  doc.roundedRect(75, y - 6, 80, 12, 2, 2, "F");
+
+  addRow("Amount:", `₹ ${receipt.amount}`, true);
+
+  addRow("Date:", new Date(receipt.created_at).toLocaleDateString());
+
+  // ===== Description =====
   doc.setFont("helvetica", "normal");
+  doc.text("Description:", 25, y);
+  const desc = doc.splitTextToSize(receipt.description || "N/A", 110);
+  doc.text(desc, 80, y);
+  y += desc.length * 6 + 5;
 
-  let yPos = 90;
-  const lineHeight = 8;
-
-  doc.text("Receipt Type:", 20, yPos);
-  doc.setFont("helvetica", "bold");
-  doc.text(receipt.receipt_type || "General", 70, yPos);
-  doc.setFont("helvetica", "normal");
-
-  yPos += lineHeight;
-  doc.text("Recipient Name:", 20, yPos);
-  doc.setFont("helvetica", "bold");
-  doc.text(receipt.recipient_name, 70, yPos);
-  doc.setFont("helvetica", "normal");
-
-  yPos += lineHeight;
-  doc.text("Amount:", 20, yPos);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.text(`₹ ${receipt.amount}`, 70, yPos);
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "normal");
-
-  yPos += lineHeight;
-  doc.text("Date:", 20, yPos);
-  doc.text(new Date(receipt.created_at).toLocaleDateString(), 70, yPos);
-
-  yPos += lineHeight;
-  doc.text("Description:", 20, yPos);
-  const descLines = doc.splitTextToSize(receipt.description || "N/A", 115);
-  doc.text(descLines, 70, yPos);
-
-  // Tax benefit note (if applicable)
+  // ===== Donation Notice =====
   if (receipt.receipt_type === "donation") {
-    doc.setFillColor(249, 115, 22); // Secondary color
-    doc.rect(15, 155, 180, 20, "F");
+    doc.setFillColor(249, 115, 22);
+    doc.roundedRect(20, y + 5, pageWidth - 40, 18, 3, 3, "F");
+
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    doc.text("This donation is eligible for 80G tax benefits", 105, 165, {
-      align: "center",
-    });
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    doc.text("Please retain this receipt for tax filing purposes", 105, 171, {
-      align: "center",
-    });
+    doc.text(
+      "Eligible for 80G Tax Benefit - Keep this receipt for tax filing.",
+      pageWidth / 2,
+      y + 17,
+      { align: "center" },
+    );
+
     doc.setTextColor(0, 0, 0);
+    y += 30;
   }
 
-  // Contact details
-  doc.setFontSize(9);
-  doc.setFont("helvetica", "normal");
-  const contactY = receipt.receipt_type === "donation" ? 185 : 165;
-  doc.text(
-    "Contact: 78776 43155 | Email: nvpwfoundationindia@gmail.com",
-    105,
-    contactY,
-    {
-      align: "center",
-    },
-  );
+  // ===== Footer Line =====
+  doc.setDrawColor(180);
+  doc.line(20, 260, pageWidth - 20, 260);
 
-  // Footer
-  doc.setFontSize(8);
-  doc.setTextColor(128, 128, 128);
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+
   doc.text(
-    "This is a computer-generated receipt and does not require a signature.",
-    105,
-    contactY + 10,
-    { align: "center" },
-  );
-  doc.text(
-    "For queries, please contact us at the above details.",
-    105,
-    contactY + 15,
+    "This is a computer-generated receipt and does not require signature.",
+    pageWidth / 2,
+    268,
     { align: "center" },
   );
 
-  // QR Code placeholder note
-  doc.setFontSize(9);
-  doc.setTextColor(0, 0, 0);
   doc.text(
-    "Scan QR code to verify: Visit nvpwelfare.in/verify",
-    105,
-    contactY + 25,
+    "For verification visit: www.rakashitasewa.org/verify",
+    pageWidth / 2,
+    274,
     { align: "center" },
   );
 

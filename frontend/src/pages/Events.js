@@ -24,7 +24,7 @@ const Events = () => {
   };
 
   useEffect(() => {
-    document.title = "Events || Emergent";
+    document.title = "Events";
   }, []);
 
   const getImageUrl = (url) => {

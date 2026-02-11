@@ -23,7 +23,7 @@ const Campaigns = () => {
   };
 
   useEffect(() => {
-    document.title = "Campaigns || Emergent";
+    document.title = "Campaigns";
   }, []);
 
   const getImageUrl = (url) => {

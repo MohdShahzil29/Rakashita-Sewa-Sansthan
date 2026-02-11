@@ -39,7 +39,7 @@ const Contact = () => {
   };
 
   useEffect(() => {
-    document.title = "Contact Us || Emergent";
+    document.title = "Contact Us";
   }, []);
 
   return (
@@ -146,7 +146,7 @@ const Contact = () => {
                   <h3 className="font-heading font-semibold text-xl text-stone-900 mb-2">
                     फोन
                   </h3>
-                  <p className="text-stone-600">78776 43155</p>
+                  <p className="text-stone-600">9982815922 , 8619362838</p>
                 </div>
               </div>
             </div>
@@ -160,9 +160,7 @@ const Contact = () => {
                   <h3 className="font-heading font-semibold text-xl text-stone-900 mb-2">
                     Email
                   </h3>
-                  <p className="text-stone-600">
-                    nvpwfoundationindia@gmail.com
-                  </p>
+                  <p className="text-stone-600">Darasingh51896@gamil.com</p>
                 </div>
               </div>
             </div>

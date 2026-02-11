@@ -6,10 +6,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Heart, Shield, FileText } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const BACKEND_URL = "https://ngo-3-freelancing-project.onrender.com";
 const API = `${BACKEND_URL}/api`;
-const RAZORPAY_KEY_ID = process.env.REACT_APP_RAZORPAY_KEY_ID || "rzp_test_key";
+const RAZORPAY_KEY_ID = "rzp_live_SAlQyx5sRXqQwH";
 
 const Donate = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +21,7 @@ const Donate = () => {
     purpose: "",
   });
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = "Donate || Emergent";
@@ -40,65 +42,67 @@ const Donate = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+    console.log("Payment ");
+    // e.preventDefault();
+    // setLoading(true);
 
-    try {
-      const scriptLoaded = await loadRazorpayScript();
-      if (!scriptLoaded) {
-        toast.error("Failed to load payment gateway");
-        setLoading(false);
-        return;
-      }
+    // try {
+    //   const scriptLoaded = await loadRazorpayScript();
+    //   if (!scriptLoaded) {
+    //     toast.error("Failed to load payment gateway");
+    //     setLoading(false);
+    //     return;
+    //   }
 
-      const response = await axios.post(
-        `${API}/donations/create-order`,
-        formData,
-      );
-      const { order_id, amount, currency, donation_id } = response.data;
+    //   const response = await axios.post(
+    //     `${API}/donations/create-order`,
+    //     formData,
+    //   );
+    //   const { order_id, amount, currency, donation_id } = response.data;
 
-      const options = {
-        key: RAZORPAY_KEY_ID,
-        amount: amount,
-        currency: currency,
-        order_id: order_id,
-        name: "NVP Welfare Foundation India",
-        description: formData.purpose || "General Donation",
-        handler: async function (response) {
-          try {
-            await axios.post(`${API}/donations/verify-payment`, {
-              order_id: order_id,
-              payment_id: response.razorpay_payment_id,
-            });
-            toast.success("Donation successful! Receipt sent to your email.");
-            setFormData({
-              donor_name: "",
-              donor_email: "",
-              donor_phone: "",
-              amount: "",
-              purpose: "",
-            });
-          } catch (error) {
-            toast.error("Payment verification failed");
-          }
-        },
-        prefill: {
-          name: formData.donor_name,
-          email: formData.donor_email,
-          contact: formData.donor_phone,
-        },
-        theme: {
-          color: "#0F766E",
-        },
-      };
+    //   const options = {
+    //     key: RAZORPAY_KEY_ID,
+    //     amount: amount,
+    //     currency: currency,
+    //     order_id: order_id,
+    //     name: "NVP Welfare Foundation India",
+    //     description: formData.purpose || "General Donation",
+    //     handler: async function (response) {
+    //       try {
+    //         await axios.post(`${API}/donations/verify-payment`, {
+    //           order_id: order_id,
+    //           payment_id: response.razorpay_payment_id,
+    //         });
+    //         toast.success("Donation successful! Receipt sent to your email.");
+    //         setFormData({
+    //           donor_name: "",
+    //           donor_email: "",
+    //           donor_phone: "",
+    //           amount: "",
+    //           purpose: "",
+    //         });
+    //         navigate("/thank-you");
+    //       } catch (error) {
+    //         toast.error("Payment verification failed");
+    //       }
+    //     },
+    //     prefill: {
+    //       name: formData.donor_name,
+    //       email: formData.donor_email,
+    //       contact: formData.donor_phone,
+    //     },
+    //     theme: {
+    //       color: "#0F766E",
+    //     },
+    //   };
 
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-    } catch (error) {
-      toast.error(error.response?.data?.detail || "Failed to initiate payment");
-    } finally {
-      setLoading(false);
-    }
+    //   const razorpay = new window.Razorpay(options);
+    //   razorpay.open();
+    // } catch (error) {
+    //   toast.error(error.response?.data?.detail || "Failed to initiate payment");
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   const quickAmounts = [500, 1000, 2500, 5000];
@@ -201,7 +205,7 @@ const Donate = () => {
                   value={formData.amount}
                   onChange={handleChange}
                   required
-                  min="100"
+                  min="50"
                   placeholder="Enter custom amount"
                   data-testid="donor-amount-input"
                 />

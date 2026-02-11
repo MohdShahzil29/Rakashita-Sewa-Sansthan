@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import logoImage from "@/assets/logo.jpeg";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -16,12 +17,13 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-3">
             <img
-              src="https://customer-assets.emergentagent.com/job_ngoboost/artifacts/oauqu6j1_IMG-20260110-WA0009.jpg"
-              alt="NVP Welfare Foundation India"
+              src={logoImage}
+              alt="Rakashita Sewa Sansthan
+"
               className="h-12 w-12 object-contain"
             />
             <span className="font-heading font-bold text-lg sm:text-xl text-stone-900">
-              NVP Welfare Foundation
+              Rakashita Sewa Sansthan
             </span>
           </Link>
 
@@ -43,6 +45,9 @@ const Navbar = () => {
               className="text-stone-700 hover:text-primary transition-colors font-medium"
             >
               Services
+            </Link>
+            <Link to="/gellery" className="text-stone-700 hover:text-primary">
+              Gallery
             </Link>
             <Link
               to="/campaigns"
@@ -131,6 +136,9 @@ const Navbar = () => {
               </Link>
               <Link to="/about" className="text-stone-700 hover:text-primary">
                 About
+              </Link>
+              <Link to="/gellery" className="text-stone-700 hover:text-primary">
+                Gallery
               </Link>
               <Link
                 to="/services"

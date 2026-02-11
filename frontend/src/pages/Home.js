@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
   Heart,
@@ -54,7 +54,7 @@ const Home = () => {
     }
   };
   useEffect(() => {
-    document.title = "Home || Emergent";
+    document.title = "Home ";
   }, []);
 
   const fetchActivities = async () => {
@@ -75,58 +75,152 @@ const Home = () => {
     }
   };
 
+  const heroImages = [
+    "https://images.unsplash.com/photo-1509099836639-18ba1795216d?q=85&auto=format&fit=crop&w=1600",
+    "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=85&auto=format&fit=crop&w=1600",
+    "https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?q=85&auto=format&fit=crop&w=1600",
+    "https://images.unsplash.com/photo-1593113598332-cd288d649433?q=85&auto=format&fit=crop&w=1600",
+  ];
+
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % heroImages.length);
+    }, 5000); // image change every 5 sec
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="min-h-screen" data-testid="home-page">
-      <section
-        className="relative h-[600px] flex items-center justify-center"
+      {/* <section
+        className="relative h-[650px] flex items-center justify-center"
         style={{
-          backgroundImage: `linear-gradient(180deg, rgba(15, 118, 110, 0.9) 0%, rgba(15, 118, 110, 0.4) 100%), url('https://images.unsplash.com/photo-1569173675610-42c361a86e37?crop=entropy&cs=srgb&fm=jpg&q=85')`,
+          backgroundImage: `linear-gradient(180deg, rgba(15,118,110,0.9) 0%, rgba(15,118,110,0.4) 100%), url('https://images.unsplash.com/photo-1569173675610-42c361a86e37?crop=entropy&cs=srgb&fm=jpg&q=85')`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-7xl mx-auto px-4 text-center">
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight mb-6"
+            className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-white mb-6"
           >
-            एक बेहतर कल का निर्माण करें
+            आज की मदद, कल की मजबूत नींव
           </motion.h1>
+
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-base text-white/90 max-w-2xl mx-auto mb-8 leading-relaxed"
+            className="text-white/90 max-w-3xl mx-auto text-lg mb-10"
           >
-            NVP Welfare Foundation India के साथ जुड़ें और समाज के विकास में
-            योगदान दें। शिक्षा, स्वास्थ्य और सशक्तिकरण के क्षेत्र में हम मिलकर
-            बदलाव ला सकते हैं।
+            Rakashita Sewa Sansthan समाज के कमजोर वर्गों के लिए शिक्षा,
+            स्वास्थ्य और सशक्तिकरण के माध्यम से एक बेहतर भविष्य बना रही है।
           </motion.p>
+
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-wrap justify-center gap-4"
           >
             <Link to="/donate">
-              <Button
-                size="lg"
-                className="bg-secondary hover:bg-secondary/90 shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8 py-3 font-semibold text-base"
-                data-testid="hero-donate-button"
-              >
-                अभी दान करें <Heart className="ml-2" size={20} />
+              <Button className="bg-secondary hover:bg-secondary/90 rounded-full px-8 py-3 font-semibold">
+                दान करें <Heart className="ml-2" size={20} />
               </Button>
             </Link>
-            <Link to="/register">
+
+            <Link to="/volunteer">
+              <Button className="bg-white text-primary hover:bg-white/90 rounded-full px-8 py-3 font-semibold">
+                स्वयंसेवक बनें
+              </Button>
+            </Link>
+
+            <Link to="/contact">
               <Button
-                size="lg"
                 variant="outline"
-                className="bg-white text-primary border-2 border-white hover:bg-primary/5 transition-all duration-300 rounded-full px-8 py-3 font-semibold text-base"
-                data-testid="hero-join-button"
+                className="border-white text-white rounded-full px-8 py-3"
               >
-                सदस्य बनें <ArrowRight className="ml-2" size={20} />
+                संपर्क करें <ArrowRight className="ml-2" size={18} />
+              </Button>
+            </Link>
+          </motion.div>
+        </div>
+      </section> */}
+
+      <section className="relative h-[650px] overflow-hidden flex items-center justify-center">
+        {/* Background Image Slider */}
+        <AnimatePresence>
+          <motion.div
+            key={index}
+            className="absolute inset-0"
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            style={{
+              backgroundImage: `
+              linear-gradient(
+                180deg,
+                rgba(15,118,110,0.9) 0%,
+                rgba(15,118,110,0.4) 100%
+              ),
+              url(${heroImages[index]})
+            `,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+        </AnimatePresence>
+
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 text-center">
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-white mb-6"
+          >
+            आज की मदद, कल की मजबूत नींव
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-white/90 max-w-3xl mx-auto text-lg mb-10"
+          >
+            Rakashita Sewa Sansthan समाज के कमजोर वर्गों के लिए शिक्षा,
+            स्वास्थ्य और सशक्तिकरण के माध्यम से एक बेहतर भविष्य बना रही है।
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="flex flex-wrap justify-center gap-4"
+          >
+            <Link to="/donate">
+              <Button className="bg-secondary hover:bg-secondary/90 rounded-full px-8 py-3 font-semibold">
+                दान करें <Heart className="ml-2" size={20} />
+              </Button>
+            </Link>
+
+            <Link to="/volunteer">
+              <Button className="bg-white text-primary hover:bg-white/90 rounded-full px-8 py-3 font-semibold">
+                स्वयंसेवक बनें
+              </Button>
+            </Link>
+
+            <Link to="/contact">
+              <Button
+                variant="outline"
+                className="border-white text-white rounded-full px-8 py-3"
+              >
+                संपर्क करें <ArrowRight className="ml-2" size={18} />
               </Button>
             </Link>
           </motion.div>

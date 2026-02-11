@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Heart,
@@ -11,267 +12,316 @@ import {
 } from "lucide-react";
 import NarenderImage from "@/assets/Narender.jpeg";
 import कृष्ण from "@/assets/कृष्ण.jpeg";
-import { useEffect } from "react";
 import जीतेशकुमारगुप्ता from "@/assets/जीतेश कुमार गुप्ता.jpeg";
+import { Link } from "react-router-dom";
+
+/**
+ * About.jsx
+ * Full updated About page for Rakshita / NVP Welfare Foundation India
+ * - Uses TailwindCSS for styling
+ * - Uses Framer Motion for animations
+ * - Animated counters implemented with requestAnimationFrame
+ */
+
+const areasOfWork = [
+  {
+    icon: Users,
+    title: "Women Empowerment & Gender Equality",
+    color: "bg-pink-100 text-pink-600",
+  },
+  {
+    icon: GraduationCap,
+    title: "Education & Skill Development",
+    color: "bg-blue-100 text-blue-600",
+  },
+  {
+    icon: Stethoscope,
+    title: "Health, Hygiene & Nutrition",
+    color: "bg-green-100 text-green-600",
+  },
+  {
+    icon: Heart,
+    title: "Child Welfare & Youth Development",
+    color: "bg-red-100 text-red-600",
+  },
+  {
+    icon: TreePine,
+    title: "Environmental Protection & Plantation",
+    color: "bg-emerald-100 text-emerald-600",
+  },
+  {
+    icon: Target,
+    title: "Rural & Urban Development",
+    color: "bg-orange-100 text-orange-600",
+  },
+  {
+    icon: Scale,
+    title: "Human Rights Awareness & Legal Aid",
+    color: "bg-purple-100 text-purple-600",
+  },
+  {
+    icon: Award,
+    title: "Disaster Relief & Rehabilitation",
+    color: "bg-yellow-100 text-yellow-600",
+  },
+];
+
+const teamMembers = [
+  { name: "जीतेश कुमार गुप्ता", role: "Co-Founder", img: जीतेशकुमारगुप्ता },
+  { name: "नरेंद्र कुमार महावर", role: "चेयरमैन", img: NarenderImage },
+  { name: "कृष्ण कुमार", role: "ट्रेजर (कोषाध्यक्ष)", img: कृष्ण },
+];
+
+const counterTargets = [
+  { id: "families", label: "परिवारों की मदद", value: 5000, suffix: "+" },
+  { id: "projects", label: "परियोजनाएं पूरी", value: 120, suffix: "+" },
+  { id: "volunteers", label: "स्वयंसेवक", value: 300, suffix: "+" },
+];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
 
 const About = () => {
-  const areasOfWork = [
-    {
-      icon: Users,
-      title: "Women Empowerment & Gender Equality",
-      color: "bg-pink-100 text-pink-600",
-    },
-    {
-      icon: GraduationCap,
-      title: "Education & Skill Development",
-      color: "bg-blue-100 text-blue-600",
-    },
-    {
-      icon: Stethoscope,
-      title: "Health, Hygiene & Nutrition",
-      color: "bg-green-100 text-green-600",
-    },
-    {
-      icon: Heart,
-      title: "Child Welfare & Youth Development",
-      color: "bg-red-100 text-red-600",
-    },
-    {
-      icon: TreePine,
-      title: "Environmental Protection & Plantation",
-      color: "bg-emerald-100 text-emerald-600",
-    },
-    {
-      icon: Target,
-      title: "Rural & Urban Development",
-      color: "bg-orange-100 text-orange-600",
-    },
-    {
-      icon: Scale,
-      title: "Human Rights Awareness & Legal Aid",
-      color: "bg-purple-100 text-purple-600",
-    },
-    {
-      icon: Award,
-      title: "Disaster Relief & Rehabilitation",
-      color: "bg-yellow-100 text-yellow-600",
-    },
-  ];
+  useEffect(() => {
+    document.title = "About Us | Rakshita Sewa Sansthan";
+    const description =
+      "Rakshita Sewa Sansthan — education, healthcare, women empowerment, environment & community development work in Rajasthan. Registered: COOP/2025/JHUNJHUNU/500639.";
+    let meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.setAttribute("content", description);
+    else {
+      meta = document.createElement("meta");
+      meta.name = "description";
+      meta.content = description;
+      document.head.appendChild(meta);
+    }
+  }, []);
 
-  const teamMembers = [
-    {
-      name: "जीतेश कुमार गुप्ता",
-      role: "Co-Founder",
-      img: जीतेशकुमारगुप्ता,
-    },
-
-    {
-      name: "नरेंद्र कुमार महावर",
-      role: "चेयरमैन",
-      img: NarenderImage,
-    },
-    {
-      name: "कृष्ण कुमार",
-      role: "ट्रेजर (कोषाध्यक्ष)",
-      img: कृष्ण,
-    },
-  ];
+  // Animated counters (simple requestAnimationFrame)
+  const [counts, setCounts] = useState(
+    counterTargets.reduce((acc, cur) => ({ ...acc, [cur.id]: 0 }), {}),
+  );
 
   useEffect(() => {
-    document.title = "About Us || Emergent";
+    let rafId;
+    const duration = 1200; // ms
+    const start = performance.now();
+
+    const animate = (now) => {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3); // cubic ease out-ish
+      const next = {};
+      counterTargets.forEach((c) => {
+        next[c.id] = Math.floor(c.value * eased);
+      });
+      setCounts(next);
+      if (t < 1) rafId = requestAnimationFrame(animate);
+    };
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
   }, []);
 
   return (
-    <div className="min-h-screen bg-stone-50" data-testid="about-page">
-      {/* Hero Section */}
+    <div
+      className="min-h-screen bg-stone-50 text-stone-900"
+      data-testid="about-page"
+    >
+      {/* HERO */}
       <section className="bg-gradient-to-r from-primary to-primary/80 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-7xl mx-auto px-4 text-center">
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-heading font-bold text-4xl sm:text-5xl mb-6"
+            transition={{ duration: 0.6 }}
+            className="font-heading font-bold text-4xl sm:text-5xl mb-4"
           >
             हमारे बारे में
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-lg max-w-3xl mx-auto leading-relaxed"
+            transition={{ duration: 0.6, delay: 0.12 }}
+            className="max-w-3xl mx-auto text-lg leading-relaxed"
           >
-            NVP (New Vision Plantation) & Welfare Foundation India - समावेशी
-            सामाजिक विकास, मानव कल्याण और भारत भर में सतत प्रगति के लिए
-            प्रतिबद्ध एक गैर-लाभकारी संगठन
+            Rakshita Sewa Sansthan — बालोदा, झूंझूनू (Reg. No.
+            COOP/2025/JHUNJHUNU/500639). हम शिक्षा, स्वास्थ्य, पोषण, महिला
+            सशक्तिकरण और पर्यावरण के ज़रिये कमजोर वर्गों की सहायता करते हैं।
           </motion.p>
         </div>
       </section>
 
-      {/* Introduction */}
+      {/* Intro Card */}
       <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl shadow-lg p-8 border border-stone-200">
-            <h2 className="font-heading font-bold text-3xl text-stone-900 mb-6 text-center">
-              NVP Welfare Foundation India
-            </h2>
-            <div className="prose prose-stone max-w-none text-stone-700 leading-relaxed space-y-4">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            className="bg-white rounded-2xl shadow-lg p-8 border border-stone-200"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            variants={{ show: { transition: { staggerChildren: 0.08 } } }}
+          >
+            <motion.h2
+              variants={fadeUp}
+              className="font-heading font-bold text-3xl text-center mb-4"
+            >
+              Rakshita Sewa Sansthan
+            </motion.h2>
+
+            <motion.div
+              variants={fadeUp}
+              className="prose prose-stone max-w-none text-stone-700 leading-relaxed space-y-3"
+            >
               <p>
-                <strong>NVP Welfare Foundation India</strong> is a non-profit
-                organization committed to inclusive social development, human
-                welfare, and sustainable progress across India. Registered in
-                the state of Rajasthan, the Foundation works with a
-                people-centric approach to uplift underprivileged communities,
-                empower women and youth, promote education, healthcare,
-                environmental protection, and ensure social justice.
+                <strong>Rakshita Sewa Sansthan</strong> is a beacon of hope for
+                the underprivileged. Registered under the Rajasthan Societies
+                Registration Act (Reg. No. COOP/2025/JHUNJHUNU/500639), our
+                organization works in memory of Late Rakshita and is committed
+                to uplifting weaker sections via education, healthcare,
+                nutrition, women empowerment, and environmental initiatives.
               </p>
+
               <p>
-                Our organization believes that true national development is
-                possible only when every individual—regardless of gender, caste,
-                age, or economic background—has access to basic rights,
-                education, healthcare, dignity, and opportunities for growth.
+                Our mission is simple yet powerful —{" "}
+                <em>
+                  No child should be deprived of education, no family should
+                  suffer due to lack of basic support.
+                </em>
               </p>
+
               <p>
-                NVP Welfare Foundation India actively designs and implements
-                programs in the fields of women empowerment, child welfare,
-                education, health & hygiene, environmental conservation, rural &
-                urban development, disaster management, skill development, youth
-                affairs, and human rights awareness. We collaborate with
-                government bodies, local institutions, volunteers, and
-                like-minded organizations to create long-lasting social impact.
+                Founded in memory of Late Rakshita, every year we organize
+                special welfare activities on her birth and death anniversaries
+                to serve the needy and promote social responsibility.
               </p>
-              <p>
-                Our initiatives focus on awareness generation, capacity
-                building, community participation, and sustainable solutions
-                that improve quality of life and promote self-reliance among
-                marginalized sections of society.
-              </p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       {/* Vision & Mission */}
       <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="bg-primary/5 rounded-xl p-8 border-l-4 border-primary"
-            >
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mr-4">
-                  <Target className="text-white" size={24} />
-                </div>
-                <h3 className="font-heading font-bold text-2xl text-stone-900">
-                  Our Vision
-                </h3>
+        <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-8">
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            className="bg-primary/5 rounded-xl p-8 border-l-4 border-primary"
+          >
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                <Target className="text-white" size={20} />
               </div>
-              <p className="text-stone-700 leading-relaxed">
-                To build an inclusive, just, and empowered society where every
-                individual can live with dignity, equality, and opportunity.
-              </p>
-            </motion.div>
+              <h3 className="font-heading text-2xl font-bold">हमारी दृष्टि</h3>
+            </div>
+            <p className="text-stone-700 leading-relaxed">
+              एक समावेशी, न्यायसंगत और सशक्त समाज जहाँ प्रत्येक व्यक्ति गरिमा और
+              अवसर के साथ जीवन जी सके।
+            </p>
+          </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="bg-secondary/5 rounded-xl p-8 border-l-4 border-secondary"
-            >
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mr-4">
-                  <Heart className="text-white" size={24} />
-                </div>
-                <h3 className="font-heading font-bold text-2xl text-stone-900">
-                  Our Mission
-                </h3>
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            className="bg-secondary/5 rounded-xl p-8 border-l-4 border-secondary"
+          >
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center">
+                <Heart className="text-white" size={20} />
               </div>
-              <ul className="text-stone-700 leading-relaxed space-y-2">
-                <li>
-                  • To promote social welfare, education, healthcare, and
-                  environmental sustainability
-                </li>
-                <li>
-                  • To empower women, children, youth, and economically weaker
-                  sections
-                </li>
-                <li>
-                  • To encourage community participation and responsible
-                  citizenship
-                </li>
-                <li>
-                  • To support government and social initiatives for holistic
-                  development
-                </li>
-                <li>
-                  • To work towards a peaceful, healthy, and progressive India
-                </li>
-              </ul>
-            </motion.div>
-          </div>
+              <h3 className="font-heading text-2xl font-bold">हमारा लक्ष्य</h3>
+            </div>
+            <ul className="text-stone-700 list-inside space-y-2">
+              <li>
+                • शिक्षा, स्वास्थ्य और पर्यावरण के माध्यम से सशक्त समाज बनाना
+              </li>
+              <li>• महिलाओं और बच्चों को आत्मनिर्भर बनाना</li>
+              <li>• समुदाय में सहभागिता और जिम्मेदार नागरिकता बढ़ाना</li>
+              <li>• पारदर्शिता और दीर्घकालिक प्रभाव सुनिश्चित करना</li>
+            </ul>
+          </motion.div>
         </div>
       </section>
 
-      {/* Founder Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-heading font-bold text-3xl sm:text-4xl text-stone-900 mb-4">
-              Founder's Message
-            </h2>
-          </div>
-
+      {/* Counters / Impact */}
+      <section className="py-10">
+        <div className="max-w-6xl mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-white rounded-xl shadow-lg overflow-hidden border border-stone-200"
+            className="bg-gradient-to-r from-secondary/5 to-primary/5 rounded-2xl p-8 border border-stone-200"
+          >
+            <h3 className="font-heading text-2xl font-bold mb-6 text-center">
+              हमारा प्रभाव
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+              {counterTargets.map((c) => (
+                <div key={c.id} className="bg-white rounded-xl p-6 shadow">
+                  <div className="text-3xl font-bold text-primary">
+                    {counts[c.id]}
+                    {c.suffix}
+                  </div>
+                  <div className="text-sm text-stone-600 mt-2">{c.label}</div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Founder */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-6">
+            Founder's Message
+          </h2>
+
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            variants={{ show: { transition: { staggerChildren: 0.08 } } }}
+            className="bg-white rounded-2xl shadow-lg overflow-hidden border border-stone-200"
           >
             <div className="grid md:grid-cols-3 gap-0">
-              {/* Founder Photo */}
               <div className="md:col-span-1 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center p-8">
                 <div className="text-center">
-                  <div className="mb-6 relative">
-                    <img
-                      src="https://customer-assets.emergentagent.com/job_ngoboost/artifacts/sko38kqw_IMG-20260113-WA0005.jpg"
-                      alt="Mukesh Kumar Mahawar"
-                      className="w-48 h-48 rounded-full object-cover mx-auto border-4 border-white shadow-lg"
-                    />
-                  </div>
-                  <h3 className="font-heading font-bold text-2xl text-stone-900 mb-2">
+                  <img
+                    src="https://customer-assets.emergentagent.com/job_ngoboost/artifacts/sko38kqw_IMG-20260113-WA0005.jpg"
+                    alt="Mukesh Kumar Mahawar"
+                    className="w-44 h-44 object-cover rounded-full border-4 border-white shadow-lg mx-auto"
+                  />
+                  <h4 className="mt-4 font-heading font-bold text-xl">
                     Mukesh Kumar Mahawar
-                  </h3>
-                  <p className="text-primary font-semibold">Founder</p>
-                  <p className="text-stone-600 text-sm mt-2">
-                    NVP Welfare Foundation India
-                  </p>
+                  </h4>
+                  <p className="text-primary font-medium">Founder</p>
                 </div>
               </div>
 
-              {/* Founder Message */}
               <div className="md:col-span-2 p-8">
-                <div className="prose prose-stone max-w-none text-stone-700 leading-relaxed space-y-4">
+                <div className="prose prose-stone max-w-none text-stone-700">
                   <p>
-                    <strong>Mukesh Kumar Mahawar</strong>, the Founder of NVP
-                    Welfare Foundation India, is a socially committed individual
-                    with a strong vision for community development and social
-                    upliftment. Inspired by the belief that service to humanity
-                    is the highest form of service, he founded NVP Welfare
-                    Foundation India to address social inequalities and create
-                    opportunities for those in need.
+                    <strong>Mukesh Kumar Mahawar</strong> founded the Foundation
+                    with a deep belief that service to humanity is the highest
+                    form of worship. Under his guidance, NVP Welfare Foundation
+                    India works on sustainable, long-term solutions focused on
+                    education, awareness, and capacity building.
                   </p>
                   <p>
-                    Under his leadership, the Foundation emphasizes ethical
-                    values, transparency, grassroots involvement, and long-term
-                    impact. His approach focuses on empowering communities
-                    through education, awareness, skill development, and
-                    sustainable welfare programs rather than short-term relief.
+                    His leadership follows principles of transparency, community
+                    involvement, and measurable impact — aiming to empower
+                    people, not create dependence.
                   </p>
                   <p>
-                    Mukesh Kumar Mahawar strongly believes that collective
-                    effort, compassion, and responsible action can transform
-                    society and contribute to nation-building.
+                    “Service to humanity is the highest form of worship. We
+                    strive to bring smiles to faces that have been forgotten by
+                    society.”
                   </p>
                 </div>
               </div>
@@ -280,67 +330,28 @@ const About = () => {
         </div>
       </section>
 
-      {/* Team Members Section */}
-      {/* <section className="py-12 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <h2 className="font-heading font-bold text-3xl text-stone-900 mb-2">
-              Team Members
-            </h2>
-            <p className="text-stone-600 max-w-2xl mx-auto">
-              हमारी टीम के मुख्य सदस्य
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-6">
-            {teamMembers.map((member, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.08 }}
-                className="bg-white rounded-xl border border-stone-200 p-6 flex items-center gap-4 hover:shadow-lg"
-                data-testid={`team-member-${idx}`}
-              >
-                <img
-                  src={member.img}
-                  alt={member.name}
-                  className="w-24 h-24 rounded-full object-cover border-2 border-primary"
-                />
-                <div>
-                  <h4 className="font-semibold text-stone-900">
-                    {member.name}
-                  </h4>
-                  <p className="text-primary font-medium mt-1">{member.role}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section> */}
-
+      {/* Team */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-10">Team Members</h2>
-
+          <h2 className="text-3xl font-bold text-center mb-8">Team Members</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {teamMembers.map((member, idx) => (
+            {teamMembers.map((m, idx) => (
               <motion.div
                 key={idx}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="bg-white border rounded-xl p-6 flex items-center gap-4 hover:shadow-lg"
+                transition={{ delay: idx * 0.06 }}
+                className="bg-white rounded-xl border border-stone-200 p-6 flex items-center gap-4 hover:shadow-lg transition-transform transform hover:-translate-y-2"
               >
                 <img
-                  src={member.img}
-                  alt={member.name}
-                  className="w-24 h-24 rounded-full object-cover border-2 border-primary"
+                  src={m.img}
+                  alt={m.name}
+                  className="w-20 h-20 rounded-full object-cover border-2 border-primary"
                 />
                 <div>
-                  <h4 className="font-semibold">{member.name}</h4>
-                  <p className="text-primary">{member.role}</p>
+                  <h4 className="font-semibold">{m.name}</h4>
+                  <p className="text-primary font-medium mt-1">{m.role}</p>
                 </div>
               </motion.div>
             ))}
@@ -349,12 +360,10 @@ const About = () => {
       </section>
 
       {/* Areas of Work */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-heading font-bold text-3xl sm:text-4xl text-stone-900 mb-4">
-              Areas of Work
-            </h2>
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-2">Areas of Work</h2>
             <p className="text-stone-600 max-w-2xl mx-auto">
               हम विभिन्न क्षेत्रों में सामाजिक कल्याण और विकास के लिए काम करते
               हैं
@@ -362,22 +371,21 @@ const About = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {areasOfWork.map((area, index) => {
+            {areasOfWork.map((area, idx) => {
               const Icon = area.icon;
               return (
                 <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
+                  key={idx}
+                  initial={{ opacity: 0, y: 12 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-xl border border-stone-200 p-6 hover:shadow-lg transition-all"
-                  data-testid={`area-${index}`}
+                  transition={{ delay: idx * 0.06 }}
+                  className="bg-white rounded-xl border border-stone-200 p-6 hover:shadow-lg"
                 >
                   <div
                     className={`w-12 h-12 ${area.color} rounded-full flex items-center justify-center mb-4`}
                   >
-                    <Icon size={24} />
+                    <Icon size={20} />
                   </div>
                   <h3 className="font-semibold text-stone-900 text-sm leading-snug">
                     {area.title}
@@ -391,63 +399,70 @@ const About = () => {
 
       {/* Commitment */}
       <section className="py-16 bg-gradient-to-br from-primary to-primary/80 text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-4xl mx-auto px-4 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="font-heading font-bold text-3xl sm:text-4xl mb-6">
+            <h3 className="font-heading text-3xl font-bold mb-4">
               Our Commitment
-            </h2>
-            <p className="text-lg leading-relaxed mb-8">
-              NVP Welfare Foundation India operates on a non-profit,
-              non-political, and non-religious basis. All resources and
-              contributions are utilized solely for the promotion of the
-              Foundation's objectives, ensuring accountability, transparency,
-              and ethical governance.
+            </h3>
+            <p className="mb-6">
+              Rakashita Sewa Sansthan operates on a non-profit, non-political,
+              and non-religious basis. We ensure accountability and transparent
+              use of resources for social upliftment.
             </p>
+
             <div className="flex flex-wrap justify-center gap-4">
               <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-3">
-                <span className="font-semibold">Non-Profit</span>
+                <strong>Non-Profit</strong>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-3">
-                <span className="font-semibold">Non-Political</span>
+                <strong>Non-Political</strong>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-3">
-                <span className="font-semibold">Non-Religious</span>
+                <strong>Transparent</strong>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-3">
-                <span className="font-semibold">Transparent</span>
+                <strong>Community-Led</strong>
               </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Contact Info */}
+      {/* Contact */}
       <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="bg-white rounded-xl shadow-lg p-8 border border-stone-200">
-            <h2 className="font-heading font-semibold text-2xl text-stone-900 mb-6 text-center">
+            <h3 className="font-heading font-semibold text-2xl text-center mb-4">
               संपर्क जानकारी
-            </h2>
+            </h3>
             <div className="grid md:grid-cols-3 gap-6 text-center">
               <div>
-                <h3 className="font-semibold text-stone-900 mb-2">पता</h3>
+                <h4 className="font-semibold mb-2">पता</h4>
                 <p className="text-stone-600">
                   नारायण निवास, बजरंग नगर, मोड़ा बालाजी रोड, दौसा, राजस्थान –
                   303303
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold text-stone-900 mb-2">फोन</h3>
-                <p className="text-stone-600">78776 43155</p>
+                <h4 className="font-semibold mb-2">फोन</h4>
+                <p className="text-stone-600">9982815922 , 8619362838</p>
               </div>
               <div>
-                <h3 className="font-semibold text-stone-900 mb-2">Email</h3>
-                <p className="text-stone-600">nvpwfoundationindia@gmail.com</p>
+                <h4 className="font-semibold mb-2">Email</h4>
+                <p className="text-stone-600">Darasingh51896@gamil.com</p>
               </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <Link to="/contact">
+                <button className="bg-primary text-white px-6 py-3 rounded-full font-semibold shadow hover:scale-105 transition">
+                  हमें संपर्क करें
+                </button>
+              </Link>
             </div>
           </div>
         </div>

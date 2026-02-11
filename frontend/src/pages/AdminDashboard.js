@@ -40,7 +40,7 @@ import {
   downloadReceiptPDF,
 } from "../utils/pdfGenerator";
 
-const BACKEND_URL = "https://ngo-3-freelancing-project.onrender.com";
+const BACKEND_URL = "http://0.0.0.0:8000";
 const API = `${BACKEND_URL}/api`;
 
 const token = localStorage.getItem("token");
@@ -2463,39 +2463,58 @@ const AdminDashboard = () => {
                         certificates.map((cert, i) => (
                           <div
                             key={cert.id || i}
-                            className="flex justify-between items-center p-4 bg-stone-50 rounded-lg"
+                            className="relative p-5 bg-white rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition"
                           >
-                            <div>
-                              <p className="font-semibold text-stone-900">
-                                {cert.recipient_name}
-                              </p>
-                              <p className="text-sm text-stone-600">
-                                {cert.recipient_email}
-                              </p>
-                              <p className="text-sm text-stone-500">
-                                Type: {cert.certificate_type}
-                              </p>
-                              <p className="text-xs text-stone-400">
-                                Cert No: {cert.certificate_number}
-                              </p>
-                              <p className="text-xs text-stone-400">
-                                Issued:{" "}
-                                {new Date(cert.issue_date).toLocaleDateString()}
-                              </p>
+                            <div className="absolute top-4 right-4">
+                              <span className="px-3 py-1 text-xs rounded-full bg-indigo-100 text-indigo-700">
+                                {cert.certificate_type.toUpperCase()}
+                              </span>
                             </div>
-                            <div className="flex items-center space-x-2">
+
+                            <div className="flex items-start gap-4">
+                              <div className="h-12 w-12 flex items-center justify-center rounded-full bg-indigo-600 text-white">
+                                <Award size={22} />
+                              </div>
+
+                              <div className="flex-1">
+                                <p className="font-semibold text-lg text-stone-900">
+                                  {cert.recipient_name}
+                                </p>
+                                <p className="text-sm text-stone-600">
+                                  {cert.recipient_email}
+                                </p>
+
+                                <div className="mt-2 text-xs text-stone-500 space-y-1">
+                                  <p>📄 Cert No: {cert.certificate_number}</p>
+                                  <p>
+                                    📅 Issued:{" "}
+                                    {new Date(
+                                      cert.issue_date,
+                                    ).toLocaleDateString()}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex gap-2 mt-4">
                               <Button
                                 size="sm"
-                                onClick={() => downloadCertificatePDF(cert)}
-                                data-testid={`download-cert-${cert.id || i}`}
+                                className="flex-1"
+                                onClick={() =>
+                                  window.open(
+                                    `${BACKEND_URL}/api/certificates/${cert.certificate_number}/download`,
+                                    "_blank",
+                                  )
+                                }
                               >
-                                <Download size={16} />
+                                <Download size={16} className="mr-2" />
+                                Download
                               </Button>
+
                               <Button
                                 size="sm"
                                 variant="destructive"
                                 onClick={() => handleDeleteCertificate(cert.id)}
-                                data-testid={`delete-cert-${cert.id || i}`}
                               >
                                 <Trash2 size={16} />
                               </Button>
