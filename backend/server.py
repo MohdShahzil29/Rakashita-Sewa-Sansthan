@@ -24,10 +24,17 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.units import inch
+from reportlab.lib.enums import TA_CENTER
 import razorpay
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+
+ROOT_DIR = Path(__file__).parent
+
+CERT_DIR = ROOT_DIR / "generated_certificates"
+CERT_DIR.mkdir(exist_ok=True)
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -51,6 +58,11 @@ else:
 # JWT Setup
 JWT_SECRET = os.environ.get('JWT_SECRET', 'star_marketing_secret_key_2025')
 JWT_ALGORITHM = 'HS256'
+
+print("RAZORPAY_KEY_ID:", RAZORPAY_KEY_ID)
+print("RAZORPAY_KEY_SECRET exists:", bool(RAZORPAY_KEY_SECRET))
+print("Razorpay client:", razorpay_client)
+
 
 # Create the main app
 app = FastAPI()
@@ -395,28 +407,63 @@ async def update_member_status(
     await db.members.update_one({"id": member_id}, {"$set": {"status": status}})
     return {"message": "Status updated"}
 
-# ==================== DONATION ROUTES ====================
+
+
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+from razorpay.errors import BadRequestError
 
 @api_router.post("/donations/create-order")
 async def create_donation_order(donation_data: dict):
+    # 1) payment gateway configured?
     if not razorpay_client:
         raise HTTPException(status_code=500, detail="Payment gateway not configured")
-    
-    amount_in_paise = int(donation_data['amount'] * 100)
-    
-    razor_order = razorpay_client.order.create({
-        "amount": amount_in_paise,
-        "currency": "INR",
-        "payment_capture": 1
-    })
-    
+
+    # 2) basic validation & logging for debugging
+    logging.info("Create order called with: %s", donation_data)
+    raw_amount = donation_data.get('amount', None)
+
+    if raw_amount is None:
+        raise HTTPException(status_code=400, detail="Missing amount")
+
+    # 3) parse amount safely using Decimal
+    try:
+        # ensure we convert things like 10, "10", "10.5" etc.
+        amount_decimal = Decimal(str(raw_amount))
+    except (InvalidOperation, ValueError):
+        raise HTTPException(status_code=400, detail="Invalid amount format")
+
+    if amount_decimal <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be greater than 0")
+
+    # 4) convert to paise and ensure integer (round half up)
+    amount_in_paise = int((amount_decimal * 100).quantize(0, rounding=ROUND_HALF_UP))
+
+    # safety check
+    if not isinstance(amount_in_paise, int):
+        raise HTTPException(status_code=400, detail="Failed to convert amount to integer paise")
+
+    try:
+        razor_order = razorpay_client.order.create({
+            "amount": amount_in_paise,
+            "currency": "INR",
+            "payment_capture": 1
+        })
+    except BadRequestError as e:
+        logging.exception("Razorpay BadRequestError: %s", e)
+        # return the gateway message (400) so frontend can show it
+        raise HTTPException(status_code=400, detail=f"Payment gateway error: {str(e)}")
+    except Exception as e:
+        logging.exception("Unexpected error while creating razorpay order: %s", e)
+        raise HTTPException(status_code=500, detail="Failed to create payment order")
+
+    # continue saving donation record
     receipt_number = generate_receipt_number()
-    
+
     donation = Donation(
-        donor_name=donation_data['donor_name'],
-        donor_email=donation_data['donor_email'],
-        donor_phone=donation_data['donor_phone'],
-        amount=donation_data['amount'],
+        donor_name=donation_data.get('donor_name', ''),
+        donor_email=donation_data.get('donor_email', ''),
+        donor_phone=donation_data.get('donor_phone', ''),
+        amount=float(amount_decimal),   # store original amount as float (or store Decimal as string)
         payment_method="online",
         order_id=razor_order['id'],
         receipt_number=receipt_number,
@@ -424,17 +471,21 @@ async def create_donation_order(donation_data: dict):
         campaign_id=donation_data.get('campaign_id'),
         status="pending"
     )
-    
+
     doc = donation.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     await db.donations.insert_one(doc)
-    
+
     return {
         "order_id": razor_order['id'],
         "amount": amount_in_paise,
         "currency": "INR",
+         "key": RAZORPAY_KEY_ID,   # 👈 ADD THIS
         "donation_id": donation.id
     }
+
+
+
 
 @api_router.post("/donations/verify-payment")
 async def verify_donation_payment(payment_data: dict):
@@ -479,6 +530,10 @@ async def get_donations(user_data: dict = Depends(verify_token)):
 
 # ==================== CERTIFICATE ROUTES ====================
 
+
+
+
+
 @api_router.post("/certificates")
 async def generate_certificate(
     cert_data: dict,
@@ -514,7 +569,7 @@ async def generate_certificate(
     <p><strong>Type:</strong> {certificate.certificate_type}</p>
     <p>You can download your certificate from your dashboard.</p>
     """
-    await send_email(certificate.recipient_email, "Certificate Issued - NVP Welfare Foundation", html_content)
+    await send_email(certificate.recipient_email, "Certificate Issued - Rakashita Sewa Sansthan", html_content)
     
     return {"message": "Certificate generated", "certificate_number": cert_number}
 
@@ -534,6 +589,303 @@ async def delete_certificate(certificate_id: str, user_data: dict = Depends(veri
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Certificate not found")
     return {"message": "Certificate deleted successfully"}
+
+
+
+
+# def create_certificate_pdf(cert: dict):
+    file_path = CERT_DIR / f"{cert['certificate_number']}.pdf"
+
+    doc = SimpleDocTemplate(
+        str(file_path),
+        pagesize=A4,
+        rightMargin=50,
+        leftMargin=50,
+        topMargin=60,
+        bottomMargin=60
+    )
+
+    elements = []
+
+    # 🌿 COLORS
+    GREEN = colors.HexColor("#1b7f5c")
+    LIGHT_GREEN = colors.HexColor("#e6f4ef")
+    DARK = colors.HexColor("#1f2937")
+
+    # ===== STYLES =====
+    title = ParagraphStyle(
+        "title",
+        fontSize=34,
+        alignment=TA_CENTER,
+        textColor=GREEN,
+        spaceAfter=10
+    )
+
+    subtitle = ParagraphStyle(
+        "subtitle",
+        fontSize=14,
+        alignment=TA_CENTER,
+        textColor=DARK,
+        spaceAfter=25
+    )
+
+    name_style = ParagraphStyle(
+        "name",
+        fontSize=30,
+        alignment=TA_CENTER,
+        textColor=DARK,
+        spaceAfter=20
+    )
+
+    body = ParagraphStyle(
+        "body",
+        fontSize=14,
+        alignment=TA_CENTER,
+        leading=22,
+        textColor=DARK,
+        spaceAfter=20
+    )
+
+    footer = ParagraphStyle(
+        "footer",
+        fontSize=10,
+        alignment=TA_CENTER,
+        textColor=colors.grey
+    )
+
+    # ===== TOP GREEN STRIP =====
+    elements.append(
+        Table(
+            [[""]],
+            colWidths=[doc.width],
+            rowHeights=[10],
+            style=[("BACKGROUND", (0, 0), (-1, -1), GREEN)]
+        )
+    )
+
+    elements.append(Spacer(1, 25))
+
+    # ===== CONTENT =====
+    elements.append(Paragraph("CERTIFICATE", title))
+    # elements.append(Paragraph("of Achievement", subtitle))
+
+    elements.append(Paragraph("This is to certify that", body))
+
+    elements.append(
+        Paragraph(
+            f"<b>{cert['recipient_name']}</b>",
+            name_style
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            "has been awarded this certificate by",
+            body
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            "<b>Rakashita Sewa Sansthan</b>",
+            body
+        )
+    )
+
+    elements.append(Spacer(4, 25))
+
+    # ===== INFO BOX =====
+    info_table = Table(
+        [
+            ["Certificate No", cert["certificate_number"]],
+            ["Issue Date", cert["issue_date"][:10]],
+            ["Type", cert["certificate_type"].upper()],
+        ],
+        colWidths=[180, doc.width - 180]
+    )
+
+    info_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), LIGHT_GREEN),
+        ("BOX", (0, 0), (-1, -1), 1, GREEN),
+        ("INNERGRID", (0, 0), (-1, -1), 0.5, GREEN),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("FONT", (0, 0), (-1, -1), "Helvetica"),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
+        ("TOPPADDING", (0, 0), (-1, -1), 12),
+    ]))
+
+    elements.append(info_table)
+    elements.append(Spacer(1, 40))
+
+    # ===== SIGNATURE =====
+    elements.append(Paragraph("Authorized Signatory", footer))
+    elements.append(Spacer(1, 8))
+    elements.append(Paragraph("Rakashita Sewa Sansthan", footer))
+
+    elements.append(Spacer(1, 20))
+
+    elements.append(
+        Paragraph(
+            "This is a computer-generated certificate and does not require a physical signature.",
+            footer
+        )
+    )
+
+    elements.append(Spacer(1, 30))
+
+    # ===== BOTTOM GREEN STRIP =====
+    elements.append(
+        Table(
+            [[""]],
+            colWidths=[doc.width],
+            rowHeights=[8],
+            style=[("BACKGROUND", (0, 0), (-1, -1), GREEN)]
+        )
+    )
+
+    doc.build(elements)
+    return file_path
+
+def create_certificate_pdf(cert: dict):
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.enums import TA_CENTER
+
+    file_path = CERT_DIR / f"{cert['certificate_number']}.pdf"
+
+    doc = SimpleDocTemplate(
+        str(file_path),
+        pagesize=A4,
+        rightMargin=60,
+        leftMargin=60,
+        topMargin=100,
+        bottomMargin=80
+    )
+
+    elements = []
+
+    GREEN = colors.HexColor("#1b7f5c")
+    LIGHT_GREEN = colors.HexColor("#eaf6ef")
+    DARK = colors.HexColor("#111827")
+    MUTED = colors.HexColor("#6b7280")
+
+    # Styles
+    title_style = ParagraphStyle(
+        name="Title",
+        fontSize=36,
+        alignment=TA_CENTER,
+        textColor=GREEN,
+        spaceAfter=8
+    )
+
+    subtitle_style = ParagraphStyle(
+        name="Subtitle",
+        fontSize=14,
+        alignment=TA_CENTER,
+        textColor=MUTED,
+        # spaceAfter=30,
+        spaceBefore=30
+
+    )
+
+    body_style = ParagraphStyle(
+        name="Body",
+        fontSize=14,
+        alignment=TA_CENTER,
+        textColor=DARK,
+        leading=22,
+        spaceAfter=30
+    )
+
+    name_style = ParagraphStyle(
+        name="Name",
+        fontSize=40,
+        alignment=TA_CENTER,
+        textColor=DARK,
+        spaceAfter=50
+    )
+
+    small_style = ParagraphStyle(
+        name="Small",
+        fontSize=10,
+        alignment=TA_CENTER,
+        textColor=MUTED,
+        spaceAfter=6
+    )
+
+    # CONTENT
+    elements.append(Paragraph("CERTIFICATE", title_style))
+    elements.append(Paragraph("of Achievement", subtitle_style))
+
+    elements.append(Paragraph("This is to certify that", body_style))
+    elements.append(Paragraph(f"<b>{cert.get('recipient_name','')}</b>", name_style))
+    elements.append(Paragraph("has been awarded this certificate", body_style))
+
+    elements.append(Spacer(1, 25))
+
+    # Info Table
+    info_table = Table(
+        [
+            ["Certificate No", cert.get("certificate_number", "")],
+            ["Issue Date", cert.get("issue_date", "")[:10]],
+            ["Type", cert.get("certificate_type", "").upper()],
+        ],
+        colWidths=[170, doc.width - 170]
+    )
+
+    info_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), LIGHT_GREEN),
+        ("BOX", (0, 0), (-1, -1), 1, GREEN),
+        ("INNERGRID", (0, 0), (-1, -1), 0.5, GREEN),
+        ("LEFTPADDING", (0, 0), (-1, -1), 12),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 12),
+        ("TOPPADDING", (0, 0), (-1, -1), 10),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+    ]))
+
+    elements.append(info_table)
+
+    elements.append(Spacer(1, 40))
+    elements.append(Paragraph("Authorized Signatory", small_style))
+    elements.append(Paragraph("<b>Rakashita Sewa Sansthan</b>", small_style))
+    elements.append(Spacer(1, 20))
+    elements.append(Paragraph(
+        "This is a computer-generated certificate and does not require a physical signature.",
+        small_style
+    ))
+
+    # Decorative strips only (NO watermark)
+    def draw_page(canvas, doc):
+        width, height = A4
+
+        canvas.saveState()
+        canvas.setFillColor(GREEN)
+        canvas.rect(doc.leftMargin, height - 60, doc.width, 12, fill=1, stroke=0)
+        canvas.restoreState()
+
+        canvas.saveState()
+        canvas.setFillColor(GREEN)
+        canvas.rect(doc.leftMargin, doc.bottomMargin - 30, doc.width, 8, fill=1, stroke=0)
+        canvas.restoreState()
+
+    doc.build(elements, onFirstPage=draw_page, onLaterPages=draw_page)
+
+    return file_path
+
+@api_router.get("/certificates/{cert_number}/download")
+async def download_certificate(cert_number: str):
+    cert = await db.certificates.find_one(
+        {"certificate_number": cert_number},
+        {"_id": 0}
+    )
+
+    if not cert:
+        raise HTTPException(404, "Certificate not found")
+
+    pdf_path = create_certificate_pdf(cert)
+    return FileResponse(pdf_path, filename=f"{cert_number}.pdf")
 
 # ==================== NEWS ROUTES ====================
 
@@ -1083,8 +1435,8 @@ app.add_middleware(
     CORSMiddleware,
        allow_origins=[
         "http://localhost:3000",
-        "http://0.0.0.0:8000",
-        "https://ngo-3-freelancing-project-ye1a.vercel.app"
+        # "http://0.0.0.0:8000",
+        # "https://ngo-3-freelancing-project-ye1a.vercel.app"
     ],
     allow_credentials=False,     # only if you need cookies/auth
     allow_methods=["*"],        # allow OPTIONS, POST, GET, etc.
