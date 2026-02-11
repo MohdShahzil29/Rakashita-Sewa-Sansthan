@@ -90,13 +90,21 @@ const Home = () => {
 
   //   return () => clearInterval(interval);
   // }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setIndex((prev) => (prev + 1) % heroImages.length);
+  //   }, 5000);
+
+  //   return () => clearInterval(interval);
+  // }, [heroImages.length]);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % heroImages.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [heroImages.length]);
+  }, []); // ✅ empty dependency
 
   return (
     <div className="min-h-screen" data-testid="home-page">
