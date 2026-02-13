@@ -1441,7 +1441,6 @@ app.add_middleware(
         "http://localhost:3000",
         "http://0.0.0.0:8000",
         "https://rakashita-sewa-sansthan.vercel.app"
-        "https://rakashita-sewa-sansthan.vercel.app"
     ],
     allow_credentials=False,     # only if you need cookies/auth
     allow_methods=["*"],        # allow OPTIONS, POST, GET, etc.

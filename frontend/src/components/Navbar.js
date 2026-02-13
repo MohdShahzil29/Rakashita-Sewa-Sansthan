@@ -46,9 +46,7 @@ const Navbar = () => {
             >
               Services
             </Link>
-            {/* <Link to="/gellery" className="text-stone-700 hover:text-primary">
-              Gallery
-            </Link> */}
+
             <Link
               to="/campaigns"
               className="text-stone-700 hover:text-primary transition-colors font-medium"

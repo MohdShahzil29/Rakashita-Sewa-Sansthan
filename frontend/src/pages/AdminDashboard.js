@@ -37,8 +37,11 @@ import {
 import { toast } from "sonner";
 import {
   downloadCertificatePDF,
+  downloadDesignationPDF,
   downloadReceiptPDF,
 } from "../utils/pdfGenerator";
+import { downloadIDCardPDF } from "../utils/pdfGenerator";
+import IDCardModal from "@/components/IDCardModal";
 
 const BACKEND_URL = "https://rakashita-sewa-sansthan.onrender.com";
 const API = `${BACKEND_URL}/api`;
@@ -73,6 +76,8 @@ const AdminDashboard = () => {
   const [memberUsers, setMemberUsers] = useState([]); // users with role=member
   const [galleryImages, setGalleryImages] = useState([]);
   const [galleryUploading, setGalleryUploading] = useState(false);
+
+  const [openModal, setOpenModal] = useState(false);
 
   // Forms state
   const [beneficiaryForm, setBeneficiaryForm] = useState({
@@ -151,6 +156,13 @@ const AdminDashboard = () => {
     recipient_email: "",
     amount: "",
     description: "",
+  });
+
+  const [designationLetterForm, setDesignationLetterForm] = useState({
+    name: "",
+    designation_name: "",
+    date_of_joining: "",
+    signature: "", // image url
   });
 
   useEffect(() => {
@@ -1598,9 +1610,108 @@ const AdminDashboard = () => {
                           placeholder="Certificate, ID Card, Voting Rights"
                         />
                       </div>
-                      <Button type="submit" className="w-full">
+                      {/* <div>
+                        <Label>Signature Upload</Label>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) =>
+                            handleImageUpload(
+                              e,
+                              setDesignationLetterForm,
+                              designationLetterForm,
+                              "signature",
+                            )
+                          }
+                        />
+                      </div> */}
+
+                      <div>
+                        <Label>Name</Label>
+                        <Input
+                          value={designationLetterForm.name}
+                          onChange={(e) =>
+                            setDesignationLetterForm({
+                              ...designationLetterForm,
+                              name: e.target.value,
+                            })
+                          }
+                          placeholder="Enter candidate name"
+                        />
+                      </div>
+
+                      <div>
+                        <Label>Designation</Label>
+                        <Input
+                          value={designationLetterForm.designation_name}
+                          onChange={(e) =>
+                            setDesignationLetterForm({
+                              ...designationLetterForm,
+                              designation_name: e.target.value,
+                            })
+                          }
+                          placeholder="Enter designation"
+                        />
+                      </div>
+
+                      <div>
+                        <Label>Date of Joining</Label>
+                        <Input
+                          type="date"
+                          value={designationLetterForm.date_of_joining}
+                          onChange={(e) =>
+                            setDesignationLetterForm({
+                              ...designationLetterForm,
+                              date_of_joining: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+
+                      <div>
+                        <Label>Signature Upload</Label>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) =>
+                            handleImageUpload(
+                              e,
+                              setDesignationLetterForm,
+                              designationLetterForm,
+                              "signature",
+                            )
+                          }
+                        />
+                      </div>
+
+                      {/* <Button type="submit" className="w-full">
                         Create Designation
+                      </Button> */}
+                      <Button
+                        onClick={() =>
+                          downloadDesignationPDF(designationLetterForm)
+                        }
+                        className="w-full"
+                      >
+                        Generate Appointment Letter
                       </Button>
+                      {/* <Button
+                        onClick={() => downloadIDCardPDF(designationLetterForm)}
+                        className="w-full mt-3"
+                      >
+                        Download Your ID Card
+                      </Button> */}
+                      <button
+                        onClick={() => setOpenModal(true)}
+                        className="bg-green-600 text-white px-4 py-2 rounded"
+                      >
+                        Download ID
+                      </button>
+
+                      <IDCardModal
+                        open={openModal}
+                        onClose={() => setOpenModal(false)}
+                      />
                     </form>
                   </CardContent>
                 </Card>

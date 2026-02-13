@@ -17,13 +17,10 @@ import VisitGallery from "@/components/VisitGallery";
 
 const BACKEND_URL = "https://rakashita-sewa-sansthan.onrender.com";
 const API = `${BACKEND_URL}/api`;
+import banner1 from "@/assets/banner1.jpeg";
+import banner2 from "@/assets/banner2.jpeg";
 
-const heroImages = [
-  "https://images.unsplash.com/photo-1509099836639-18ba1795216d?q=85&auto=format&fit=crop&w=1600",
-  "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=85&auto=format&fit=crop&w=1600",
-  "https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?q=85&auto=format&fit=crop&w=1600",
-  "https://images.unsplash.com/photo-1593113598332-cd288d649433?q=85&auto=format&fit=crop&w=1600",
-];
+const heroImages = [banner1, banner2];
 
 const Home = () => {
   const [stats, setStats] = useState({
@@ -84,20 +81,6 @@ const Home = () => {
   };
 
   const [index, setIndex] = useState(0);
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setIndex((prev) => (prev + 1) % heroImages.length);
-  //   }, 5000); // image change every 5 sec
-
-  //   return () => clearInterval(interval);
-  // }, []);
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setIndex((prev) => (prev + 1) % heroImages.length);
-  //   }, 5000);
-
-  //   return () => clearInterval(interval);
-  // }, [heroImages.length]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -109,65 +92,8 @@ const Home = () => {
 
   return (
     <div className="min-h-screen" data-testid="home-page">
-      {/* <section
-        className="relative h-[650px] flex items-center justify-center"
-        style={{
-          backgroundImage: `linear-gradient(180deg, rgba(15,118,110,0.9) 0%, rgba(15,118,110,0.4) 100%), url('https://images.unsplash.com/photo-1569173675610-42c361a86e37?crop=entropy&cs=srgb&fm=jpg&q=85')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-white mb-6"
-          >
-            आज की मदद, कल की मजबूत नींव
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-white/90 max-w-3xl mx-auto text-lg mb-10"
-          >
-            Rakashita Sewa Sansthan समाज के कमजोर वर्गों के लिए शिक्षा,
-            स्वास्थ्य और सशक्तिकरण के माध्यम से एक बेहतर भविष्य बना रही है।
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-4"
-          >
-            <Link to="/donate">
-              <Button className="bg-secondary hover:bg-secondary/90 rounded-full px-8 py-3 font-semibold">
-                दान करें <Heart className="ml-2" size={20} />
-              </Button>
-            </Link>
-
-            <Link to="/volunteer">
-              <Button className="bg-white text-primary hover:bg-white/90 rounded-full px-8 py-3 font-semibold">
-                स्वयंसेवक बनें
-              </Button>
-            </Link>
-
-            <Link to="/contact">
-              <Button
-                variant="outline"
-                className="border-white text-white rounded-full px-8 py-3"
-              >
-                संपर्क करें <ArrowRight className="ml-2" size={18} />
-              </Button>
-            </Link>
-          </motion.div>
-        </div>
-      </section> */}
-
-      <section className="relative h-[650px] overflow-hidden flex items-center justify-center">
+      {/* <section className="relative h-[420px] sm:h-[500px] lg:h-[650px] overflow-hidden flex items-center justify-center"> */}
+      <section className="relative h-[360px] sm:h-[500px] lg:h-[650px] overflow-hidden flex items-center justify-center">
         {/* Background Image Slider */}
         <AnimatePresence>
           <motion.div

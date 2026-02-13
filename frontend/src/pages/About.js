@@ -18,8 +18,7 @@ import goverment from "@/assets/goverment.jpeg";
 
 /**
  * About.jsx
- * Full updated About page for Rakshita / NVP Welfare Foundation India
- * - Uses TailwindCSS for styling
+ * Full updated About page for Rakshita / Rakashita sewa sansthantyling
  * - Uses Framer Motion for animations
  * - Animated counters implemented with requestAnimationFrame
  */
@@ -295,11 +294,11 @@ const About = () => {
                 <div className="text-center">
                   <img
                     src={FounderImage}
-                    alt="Mukesh Kumar Mahawar"
+                    alt="Dhara singh"
                     className="w-44 h-44 object-cover rounded-full border-4 border-white shadow-lg mx-auto"
                   />
                   <h4 className="mt-4 font-heading font-bold text-xl">
-                    Mukesh Kumar Mahawar
+                    Dhara singh
                   </h4>
                   <p className="text-primary font-medium">Founder</p>
                 </div>
@@ -308,11 +307,11 @@ const About = () => {
               <div className="md:col-span-2 p-8">
                 <div className="prose prose-stone max-w-none text-stone-700">
                   <p>
-                    <strong>Mukesh Kumar Mahawar</strong> founded the Foundation
-                    with a deep belief that service to humanity is the highest
-                    form of worship. Under his guidance, NVP Welfare Foundation
-                    India works on sustainable, long-term solutions focused on
-                    education, awareness, and capacity building.
+                    <strong>Dhara singh</strong> founded the Foundation with a
+                    deep belief that service to humanity is the highest form of
+                    worship. Under his guidance, Rakashita sewa sansthan works
+                    on sustainable, long-term solutions focused on education,
+                    awareness, and capacity building.
                   </p>
                   <p>
                     His leadership follows principles of transparency, community
