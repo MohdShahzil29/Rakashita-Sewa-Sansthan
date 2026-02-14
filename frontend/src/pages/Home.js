@@ -19,8 +19,10 @@ const BACKEND_URL = "https://rakashita-sewa-sansthan.onrender.com";
 const API = `${BACKEND_URL}/api`;
 import banner1 from "@/assets/banner1.jpeg";
 import banner2 from "@/assets/banner2.jpeg";
+import banner3 from "@/assets/banner3.jpeg";
+import banner4 from "@/assets/banner4.jpeg";
 
-const heroImages = [banner1, banner2];
+const heroImages = [banner3, banner4, banner1, banner2];
 
 const Home = () => {
   const [stats, setStats] = useState({
